@@ -131,6 +131,7 @@ typedef enum
   OPTID_NODELTAT,
   OPTID_NORELATIVE,
   OPTID_NOWALLCLOCK,
+  OPTID_SHOWSTATE,
   OPTID_VERSION,
   OPTID_LAST,
 }
@@ -147,6 +148,7 @@ typedef struct globals_s
   bool  showInitialState;
   bool  showRelative;
   bool  showWallClock;
+  bool  showState;
   bool  useLocalTime;
   bool  version;
 
@@ -451,6 +453,7 @@ static void usage (void)
   printf ("    --nodeltat            Do not display time between pin changes\n");
   printf ("    --norelative          Do not display relative time between pin changes\n");
   printf ("    --nowallclock         Do not display wall clock time when pin changes\n");
+  printf ("    --showstate           Always show 'high' or 'low' on unchanged pins\n");
   printf ("    --version             Show program version and exit\n");
   printf ("\n");
 }
@@ -470,6 +473,7 @@ static int processCommandLine (int argc, char **argv)
     { "nodeltat",    no_argument,       &opt, OPTID_NODELTAT    }, // --nodeltat                 Don't display delta-T times
     { "norelative",  no_argument,       &opt, OPTID_NORELATIVE  }, // --norelative               Don't display relative time
     { "nowallclock", no_argument,       &opt, OPTID_NOWALLCLOCK }, // --nowallclock              Don't display wall clock time
+    { "showstate",   no_argument,       &opt, OPTID_SHOWSTATE   }, // --showstate                Always show 'high' or 'low' on unchanged pins
     { "version",     no_argument,       &opt, OPTID_VERSION     }, // --version                  Display program version and exit
     { NULL,          0,                 NULL, 0                 }
   };
@@ -530,6 +534,10 @@ static int processCommandLine (int argc, char **argv)
 
             case OPTID_NOWALLCLOCK :
               g.showWallClock = false;
+              break;
+
+            case OPTID_SHOWSTATE :
+              g.showState = true;
               break;
 
             case OPTID_VERSION :
@@ -762,10 +770,12 @@ static void mainLoop (void)
         pinList [i].pinState = tempState;
         pinsChanged = true;
       }
+      else
+        pinList [i].pinChanged = false;
     }
 
     if (pinsChanged)
-      showPinStates (false);
+      showPinStates (g.showState);
 
     usleep (10 * 1000);
   }
