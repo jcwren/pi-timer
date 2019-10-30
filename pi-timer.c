@@ -160,6 +160,7 @@ typedef struct pinList_s
 {
   int pinNumber;
   const char *pinName;
+  gpioPull_e pinPull;
   char *pinNameFmt;
   bool pinState;
   bool pinChanged;
@@ -172,9 +173,9 @@ pinList_t;
 static globals_t g;
 static pinList_t pinList [] =
 {
-  { .pinNumber = 17, .pinName = "Toggle",   },
-  { .pinNumber = 27, .pinName = "Pre-Warn", },
-  { .pinNumber = 22, .pinName = "PowerCtl", },
+  { .pinNumber = 17, .pinName = "Toggle",   .pinPull = GPIOPULL_UP, },
+  { .pinNumber = 27, .pinName = "Pre-Warn", .pinPull = GPIOPULL_UP, },
+  { .pinNumber = 22, .pinName = "PowerCtl", .pinPull = GPIOPULL_UP, },
 };
 
 //
@@ -576,11 +577,12 @@ static int configurePins (void)
 {
   for (size_t i = 0; i < arrsizeof (pinList); i++)
   {
+    pinList_t *pl = &pinList [i];
     int r;
 
-    if ((r = gpioConfigurePin (pinList [i].pinNumber, GPIOFSEL_INPUT, GPIOPULL_UP, GPIOLEVEL_NONE)))
+    if ((r = gpioConfigurePin (pl->pinNumber, GPIOFSEL_INPUT, pl->pinPull, GPIOLEVEL_NONE)))
     {
-      fprintf (stderr, "gpioConfigurePin() failed on pin #%d (%s) with error %d\n", pinList [i].pinNumber, pinList [i].pinName, r);
+      fprintf (stderr, "gpioConfigurePin() failed on pin #%d (%s) with error %d\n", pl->pinNumber, pl->pinName, r);
       return -1;
     }
   }
