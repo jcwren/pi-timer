@@ -67,7 +67,6 @@
 #define FALSE (0)
 #define max(a,b) ((a)>(b)?(a):(b))
 #define min(a,b) ((a)<(b)?(a):(b))
-#define DEBUG() do { fprintf (stderr, "line %d\n", __LINE__); } while (0)
 #define MIN(a,b)               \
    ({ __typeof__ (a) _a = (a); \
       __typeof__ (b) _b = (b); \
@@ -173,9 +172,9 @@ pinList_t;
 static globals_t g;
 static pinList_t pinList [] =
 {
-  { .pinNumber = PIN_PIC10F322_TOGGLE,    .pinName = "Toggle",   },
-  { .pinNumber = PIN_PIC10F322_PREWARN,   .pinName = "Pre-Warn", },
-  { .pinNumber = PIN_PIC10F322_POWERCTL,  .pinName = "PowerCtl", },
+  { .pinNumber = PIN_PIC10F322_TOGGLE,   .pinName = "Toggle",   },
+  { .pinNumber = PIN_PIC10F322_PREWARN,  .pinName = "Pre-Warn", },
+  { .pinNumber = PIN_PIC10F322_POWERCTL, .pinName = "PowerCtl", },
 };
 
 //
@@ -707,42 +706,6 @@ static void showPinStates (bool force)
   printf ("%s\n", output);
 }
 
-//
-//
-//
-static void mainLoop (void); // FIXME: rearrange order when done
-int main (int argc, char **argv)
-{
-  if (processCommandLine (argc, argv))
-    exit (1);
-
-  if (g.version)
-  {
-    printf ("%s %s\n", basename (argv [0]), VERSION);
-    exit (0);
-  }
-
-  if (geteuid ())
-  {
-    fprintf (stderr, "Must be root to run this program\n");
-    exit (1);
-  }
-
-  if (mmapHardwareBase ())
-    exit (1);
-
-  if (g.chipType)
-  {
-    fprintf (stderr, "%s\n", g.is_2711 ? "2711" : "2708");
-    exit (0);
-  }
-
-  if (configurePins ())
-    exit (1);
-
-  mainLoop ();
-}
-
 static void mainLoop (void)
 {
   char hdrString [256];
@@ -814,4 +777,38 @@ static void mainLoop (void)
 
     usleep (10 * 1000);
   }
+}
+//
+//
+//
+int main (int argc, char **argv)
+{
+  if (processCommandLine (argc, argv))
+    exit (1);
+
+  if (g.version)
+  {
+    printf ("%s %s\n", basename (argv [0]), VERSION);
+    exit (0);
+  }
+
+  if (geteuid ())
+  {
+    fprintf (stderr, "Must be root to run this program\n");
+    exit (1);
+  }
+
+  if (mmapHardwareBase ())
+    exit (1);
+
+  if (g.chipType)
+  {
+    fprintf (stderr, "%s\n", g.is_2711 ? "2711" : "2708");
+    exit (0);
+  }
+
+  if (configurePins ())
+    exit (1);
+
+  mainLoop ();
 }
