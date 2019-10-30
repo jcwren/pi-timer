@@ -4,7 +4,7 @@ a Raspberry Pi's GPIO pins.
 
 ## TODO
 [ ] Remove hardcoded pin numbers and names
-[ ] Add CLI options to specify pin numbers and names
+[ ] Add CLI options to specify pin numbers, names, pull-up/down/none options
 [ ] Write pin changes to CSV file
 [ ] Add real-time output with time and time since last change (CLI option)
 [ ] Allow delay between samples to be specified
