@@ -1,5 +1,4 @@
-# pitimer
-
+# pi-timer
 A very sparse sort of logic analyzer for measuring long duration events using
 a Raspberry Pi's GPIO pins.
 
