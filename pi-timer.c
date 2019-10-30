@@ -142,13 +142,13 @@ optID_e;
 typedef struct globals_s
 {
   bool  chipType;
-  bool  version;
-  bool  showInitialState;
-  bool  showWallClock;
-  bool  showRelative;
   bool  showDeltaT;
   bool  showInitial;
+  bool  showInitialState;
+  bool  showRelative;
+  bool  showWallClock;
   bool  useLocalTime;
+  bool  version;
 
   int mmap_fd;
   volatile uint32_t *gpioBase;
@@ -172,9 +172,9 @@ pinList_t;
 static globals_t g;
 static pinList_t pinList [] =
 {
-  { .pinNumber = PIN_PIC10F322_TOGGLE,   .pinName = "Toggle",   },
-  { .pinNumber = PIN_PIC10F322_PREWARN,  .pinName = "Pre-Warn", },
-  { .pinNumber = PIN_PIC10F322_POWERCTL, .pinName = "PowerCtl", },
+  { .pinNumber = 17, .pinName = "Toggle",   },
+  { .pinNumber = 27, .pinName = "Pre-Warn", },
+  { .pinNumber = 22, .pinName = "PowerCtl", },
 };
 
 //
@@ -567,7 +567,6 @@ static int processCommandLine (int argc, char **argv)
   }
 
   return 0;
-
 }
 
 //
@@ -575,24 +574,15 @@ static int processCommandLine (int argc, char **argv)
 //
 static int configurePins (void)
 {
-  int r;
-
-  if ((r = gpioConfigurePin (PIN_PIC10F322_TOGGLE, GPIOFSEL_INPUT, GPIOPULL_UP, GPIOLEVEL_NONE)))
+  for (size_t i = 0; i < arrsizeof (pinList); i++)
   {
-    fprintf (stderr, "gpioConfigurePin (PIN_PIC10F322_TOGGLE) returned error %d\n", r);
-    return -1;
-  }
+    int r;
 
-  if ((r = gpioConfigurePin (PIN_PIC10F322_PREWARN, GPIOFSEL_INPUT, GPIOPULL_UP, GPIOLEVEL_NONE)))
-  {
-    fprintf (stderr, "gpioConfigurePin (PIN_PIC10F322_PREWARN) returned error %d\n", r);
-    return -1;
-  }
-
-  if ((r = gpioConfigurePin (PIN_PIC10F322_POWERCTL, GPIOFSEL_INPUT, GPIOPULL_UP, GPIOLEVEL_NONE)))
-  {
-    fprintf (stderr, "gpioConfigurePin (PIN_PIC10F322_POWERCTL) returned error %d\n", r);
-    return -1;
+    if ((r = gpioConfigurePin (pinList [i].pinNumber, GPIOFSEL_INPUT, GPIOPULL_UP, GPIOLEVEL_NONE)))
+    {
+      fprintf (stderr, "gpioConfigurePin() failed on pin #%d (%s) with error %d\n", pinList [i].pinNumber, pinList [i].pinName, r);
+      return -1;
+    }
   }
 
   return 0;
